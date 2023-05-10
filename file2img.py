@@ -32,8 +32,7 @@ def bytes_to_image(binary):
     length = len(binary)
     width,height = crack(length)
     img = Image.new("L", (width,height), color=0)
-    # fix this
-    i = 0
+    i = 0 # index the bytes array
     for y in range(height):
         for x in range(width):
             color = binary[i]
@@ -79,8 +78,6 @@ def decode_image_to_file(image_path,file_path):
 
 
 
-
-
 def cli():
     from sys import argv,stderr
     from os.path import basename
@@ -100,7 +97,6 @@ def cli():
         except FileNotFoundError as e:
             eprint(e)
             exit(e.errno)
-            
 
     def decode():
         try:
@@ -119,7 +115,6 @@ def cli():
             decode()
         case _:
             show_help()
-    
     
 
 if __name__ == "__main__":

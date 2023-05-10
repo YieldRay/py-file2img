@@ -94,13 +94,17 @@ class Win(WinGUI):
         lb = self.widget_dic["tk_label_select_file_label"]
         btn = self.widget_dic["tk_button_convert_file"]
         if path != "":
-            lb.config(text=path)
+            lb.configure(text=path)
             btn.configure(state="active")
         else:
-            lb.config(text="未选择文件")
+            lb.configure(text="未选择文件")
             btn.configure(state="disabled")
         
     def handler_convert_file(self,evt):
+        btn = self.widget_dic["tk_button_convert_file"]
+        if str(btn["state"])=="disabled":
+            return
+        
         lb = self.widget_dic["tk_label_select_file_label"]
         file_path = lb["text"]
         path = filedialog.asksaveasfilename(title="选择保存的路径",initialfile="修改此处文件名_后缀要为png.png",filetypes=[("PNG图像",".png")])
@@ -120,14 +124,18 @@ class Win(WinGUI):
         lb = self.widget_dic["tk_label_select_image_label"]
         btn = self.widget_dic["tk_button_convert_image"]
         if path != "":
-            lb.config(text=path)
+            lb.configure(text=path)
             btn.configure(state="active")
         else:
-            lb.config(text="未选择文件")
+            lb.configure(text="未选择文件")
             btn.configure(state="disabled")
 
         
     def handler_convert_image(self,evt):
+        btn = self.widget_dic["tk_button_convert_image"]
+        if str(btn["state"])=="disabled":
+            return
+
         lb = self.widget_dic["tk_label_select_image_label"]
         file_path = lb["text"]
         path = filedialog.asksaveasfilename(title="选择保存的路径",initialfile="修改此处文件名及后缀")
