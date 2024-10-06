@@ -3,19 +3,24 @@
 ```sh
 git clone https://github.com/YieldRay/py-file2img
 cd py-file2img
+
+# venv (optional)
+python -m venv .
+source Scripts/activate
+
 pip install -r requirements.txt
 ```
 
 ## CLI
 
 ```sh
-python3 ./file2img.py
+python ./file2img.py
 ```
 
 ## GUI
 
 ```sh
-python3 ./gui.py
+python ./gui.py
 ```
 
 or build the GUI to an executable by command `pyinstaller gui.py -w`  
