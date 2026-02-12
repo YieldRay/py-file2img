@@ -1,0 +1,106 @@
+name: Build and Release GUI
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v1.0.0)"
+        required: true
+        type: string
+
+env:
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+
+jobs:
+  build:
+    name: Build (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows-x64
+            archive_ext: zip
+          - os: macos-latest
+            platform: macos
+            archive_ext: zip
+          - os: ubuntu-latest
+            platform: linux-x64
+            archive_ext: tar.gz
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Setup Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.12"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7.3.0
+
+      - name: Install project dependencies
+        run: uv sync
+
+      - name: Build GUI with PyInstaller
+        run: uv run --with pyinstaller pyinstaller gui.py -w -n file2img-gui --onedir --clean
+
+      - name: Package Windows artifact
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $assetName = "py-file2img-$env:RELEASE_TAG-${{ matrix.platform }}.${{ matrix.archive_ext }}"
+          Compress-Archive -Path "dist/file2img-gui" -DestinationPath "dist/$assetName" -Force
+
+      - name: Package macOS artifact
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          set -euo pipefail
+          asset_name="py-file2img-${RELEASE_TAG}-${{ matrix.platform }}.${{ matrix.archive_ext }}"
+          ditto -c -k --sequesterRsrc --keepParent "dist/file2img-gui.app" "dist/${asset_name}"
+
+      - name: Package Linux artifact
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          asset_name="py-file2img-${RELEASE_TAG}-${{ matrix.platform }}.${{ matrix.archive_ext }}"
+          tar -C dist -czf "dist/${asset_name}" "file2img-gui"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v6.0.0
+        with:
+          name: build-${{ matrix.platform }}
+          path: dist/py-file2img-${{ env.RELEASE_TAG }}-${{ matrix.platform }}.${{ matrix.archive_ext }}
+          if-no-files-found: error
+
+  release:
+    name: Publish Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v7.0.0
+        with:
+          path: release-assets
+          pattern: build-*
+          merge-multiple: true
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2.5.0
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_TAG }}
+          files: release-assets/*
+          generate_release_notes: true

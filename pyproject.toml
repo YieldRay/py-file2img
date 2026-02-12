@@ -1,0 +1,19 @@
+[project]
+name = "py-file2img"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["Pillow==12.1.1"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+
+[project.scripts]
+file2img-cli = "file2img:cli"
+file2img-gui = "gui:main"
+
+[tool.setuptools]
+py-modules = ["file2img", "gui"]

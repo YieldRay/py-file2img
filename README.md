@@ -4,23 +4,21 @@
 git clone https://github.com/YieldRay/py-file2img
 cd py-file2img
 
-# venv (optional)
-python -m venv .
-source Scripts/activate
-
-pip install -r requirements.txt
+# install dependencies with uv
+uv sync
 ```
 
 ## CLI
 
 ```sh
-python ./file2img.py
+uv run file2img-cli encode <file_path> <image_path>
+uv run file2img-cli decode <image_path> <file_path>
 ```
 
 ## GUI
 
 ```sh
-python ./gui.py
+uv run file2img-gui
 ```
 
 or build the GUI to an executable by command `pyinstaller gui.py -w`  

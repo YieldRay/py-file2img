@@ -6,3 +6,7 @@ Lib/
 Scripts/
 *.spec
 *.cfg
+*.egg-info/
+.ruff_cache/
+.venv
+uv.lock
